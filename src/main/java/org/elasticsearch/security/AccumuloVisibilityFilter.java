@@ -4,6 +4,7 @@ import org.apache.accumulo.core.security.Authorizations;
 import org.apache.accumulo.core.security.ColumnVisibility;
 import org.apache.accumulo.core.security.VisibilityEvaluator;
 import org.apache.accumulo.core.security.VisibilityParseException;
+import org.apache.commons.collections.map.LRUMap;
 import org.elasticsearch.common.logging.ESLogger;
 import org.elasticsearch.index.fielddata.ScriptDocValues;
 import org.elasticsearch.script.AbstractSearchScript;
@@ -15,6 +16,7 @@ public class AccumuloVisibilityFilter extends AbstractSearchScript {
 
     private final ESLogger logger;
     private final VisibilityEvaluator visibilityEvaluator;
+    private final LRUMap cache = new LRUMap(1000);
     private String securityExpressionField = "securityExpression";
 
     public AccumuloVisibilityFilter(Map<String, Object> params, ESLogger logger) {
@@ -46,8 +48,15 @@ public class AccumuloVisibilityFilter extends AbstractSearchScript {
 
         String visibilityExpression = values.get(0).toString();
 
+        Boolean result = (Boolean) cache.get(visibilityExpression);
+        if (result != null) {
+            return result;
+        }
+
         try {
-            return visibilityEvaluator.evaluate(new ColumnVisibility(visibilityExpression));
+            result = visibilityEvaluator.evaluate(new ColumnVisibility(visibilityExpression));
+            cache.put(visibilityExpression, result);
+            return result;
         } catch (VisibilityParseException e) {
             logger.error("Document contained unparseable '" + securityExpressionField + "' <" + visibilityExpression + ">!");
             return false;
