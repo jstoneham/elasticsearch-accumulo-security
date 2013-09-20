@@ -14,20 +14,23 @@ import java.util.Map;
 public class AccumuloVisibilityFilter extends AbstractSearchScript {
 
     private final ESLogger logger;
-    private final Map<String, Object> params;
+    private final VisibilityEvaluator visibilityEvaluator;
+    private String securityExpressionField = "securityExpression";
 
     public AccumuloVisibilityFilter(Map<String, Object> params, ESLogger logger) {
         this.logger = logger;
-        this.params = params;
+
+        if (params.get("expressionField") != null) {
+            this.securityExpressionField = params.get("expressionField").toString();
+        }
+
+        String auths = params.get("auths").toString();
+        Authorizations authorizations = new Authorizations(auths.split(","));
+        this.visibilityEvaluator = new VisibilityEvaluator(authorizations);
     }
 
     @Override
     public Object run() {
-        String securityExpressionField = "securityExpression";
-        if (params.get("expressionField") != null) {
-            securityExpressionField = params.get("expressionField").toString();
-        }
-
         ScriptDocValues docValues = (ScriptDocValues) doc().get(securityExpressionField);
 
         if (docValues == null) {
@@ -41,12 +44,10 @@ public class AccumuloVisibilityFilter extends AbstractSearchScript {
             return false;
         }
 
-        String auths = params.get("auths").toString();
-        Authorizations authorizations = new Authorizations(auths.split(","));
         String visibilityExpression = values.get(0).toString();
 
         try {
-            return new VisibilityEvaluator(authorizations).evaluate(new ColumnVisibility(visibilityExpression));
+            return visibilityEvaluator.evaluate(new ColumnVisibility(visibilityExpression));
         } catch (VisibilityParseException e) {
             logger.error("Document contained unparseable '" + securityExpressionField + "' <" + visibilityExpression + ">!");
             return false;
