@@ -23,3 +23,10 @@ Authorizations auths = new Authorizations("ABC", "DEF", "GHI");
 filters.add(FilterBuilders.scriptFilter("visibility").lang("native").
     addParam("auths", auths.serialize()).addParam("expressionField", "myCustomSecurityFieldName"));
 ```
+
+Artifacts currently not available in any public Maven repo.
+To release:
+
+mvn release:prepare
+mvn release:perform -Darguments="-DaltDeploymentRepository=REPOIDHERE::default::REPOURLHERE"
+(example: mvn release:perform -Darguments="-DaltDeploymentRepository=mycompany::default::http://192.168.1.1:8080/nexus/content/repositories/releases")
