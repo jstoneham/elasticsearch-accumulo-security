@@ -26,8 +26,13 @@ public class AccumuloVisibilityFilter extends AbstractSearchScript {
             this.securityExpressionField = params.get("expressionField").toString();
         }
 
-        String auths = params.get("auths").toString();
-        Authorizations authorizations = new Authorizations(auths.split(","));
+        String auths = params.get("auths").toString().trim();
+        Authorizations authorizations;
+        if (auths.isEmpty()) {
+            authorizations = new Authorizations();
+        } else {
+            authorizations = new Authorizations(auths.split(","));
+        }
         this.visibilityEvaluator = new VisibilityEvaluator(authorizations);
     }
 
