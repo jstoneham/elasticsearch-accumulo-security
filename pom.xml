@@ -4,7 +4,7 @@
     <groupId>canary</groupId>
     <artifactId>elasticsearch-accumulo-security</artifactId>
     <name>ElasticSearch Accumulo Security</name>
-    <version>0.0.2-SNAPSHOT</version>
+    <version>0.0.2</version>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -13,7 +13,7 @@
         <url>https://github.com/texeltek/elasticsearch-accumulo-security</url>
         <connection>scm:git:git@github.com:texeltek/elasticsearch-accumulo-security.git</connection>
         <developerConnection>scm:git:git@github.com:texeltek/elasticsearch-accumulo-security.git</developerConnection>
-      <tag>HEAD</tag>
+      <tag>elasticsearch-accumulo-security-0.0.2</tag>
     </scm>
     <dependencies>
         <dependency>
