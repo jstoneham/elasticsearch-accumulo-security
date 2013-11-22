@@ -16,6 +16,7 @@ script.native:
 ```
 
 - Add a field "securityExpression" to your documents, which contains the string form of an Accumulo ColumnVisibility. Example: new String(columnVisibility.getExpression()), like "ABC&DEF&(GHI|JKL)". NOTE: passing filter parameter "expressionField" allows you to customize the name of this field.
+- Ensure that your field is not_analyzed otherwise ElasticSearch will attempt to analyze security expressions like A&B&(C|E|F)
 - When querying, add a filter to invoke the script like so:
 
 ```
@@ -23,6 +24,7 @@ Authorizations auths = new Authorizations("ABC", "DEF", "GHI");
 filters.add(FilterBuilders.scriptFilter("visibility").lang("native").
     addParam("auths", auths.serialize()).addParam("expressionField", "myCustomSecurityFieldName"));
 ```
+
 
 Artifacts currently not available in any public Maven repo.
 To release:
